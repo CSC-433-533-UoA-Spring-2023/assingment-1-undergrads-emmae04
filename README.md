@@ -19,6 +19,6 @@ method to roate the image that had been updated
 * bunny.ppm     -- a test image
 
 
-**PLEASE PROVIDE ANY ATTRIBUTION HERE**
-* Images obtained from the following sources:
+Attribution:
+  * for some basic understanding of animation: https://webglfundamentals.org/webgl/lessons/webgl-animation.html
   * bunny: http://graphics.stanford.edu/data/3Dscanrep/  
