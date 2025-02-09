@@ -1,21 +1,20 @@
-Author: {FirstName LastName} [{UA Email}]  
-Course: Grad 533 or Undergrad 433
-Date: [Month]. [Day], 2025
-
-**PLEASE UPDATE THIS README TO INCLUDE:**
-* a text description of how to run your program, 
-* document any idiosyncrasies, behaviors, or bugs of note that you want us to be aware of when grading, and
-* any other comments that you feel are relevant.
-
-Executing program:
+Author: Emma Elliott
+Course: Undergrad 433
+Date: 02/09/2025
 
 
-Description:
+* This program will allow the user to upload an image
+  and rotate it 
+* Additionally, it will resize the image so that it doesn't
+  leave the bounding box
+* To run: open a local server and click "choose file". You can 
+  upload a file or use bunny.ppm to view the animation
 
 
-Included files (**PLEASE ADD/UPDATE THIS LIST**):
+Included files :
 * index.html    -- a sample html file with a canvas
-* a01.js        -- a sample javascript file for functionality with the image uploading, and a method to parse PPM images
+* a01.js        -- a sample javascript file for functionality with the image uploading, a method to parse PPM images, and a 
+method to roate the image that had been updated
 * MathUtilities.js		-- some math functions that you can use and extend yourself. It contains matrix manipulations
 * bunny.ppm     -- a test image
 

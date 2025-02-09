@@ -17,6 +17,8 @@ var height = 0;
 // The image data
 var ppm_img_data;
 
+var rotationInterval;
+
 //Function to process upload
 var upload = function () {
     if (input.files.length > 0) {
@@ -31,17 +33,23 @@ var upload = function () {
             var file_data = fReader.result;
             parsePPM(file_data);
 
-            /*
-            * TODO: ADD CODE HERE TO DO 2D TRANSFORMATION and ANIMATION
-            * Modify any code if needed
-            * Hint: Write a rotation method, and call WebGL APIs to reuse the method for animation
-            */
-	    
-            // *** The code below is for the template to show you how to use matrices and update pixels on the canvas.
-            // *** Modify/remove the following code and implement animation
+            var currentAngle = 0;
+            rotationInterval = setInterval(() => {
+                // this function will rotate the image every 5 degrees 
+                // every .1 seconds
+                currentAngle += 5; 
+                if (currentAngle >= 360) {
+                    currentAngle = currentAngle-360;
+                }
+                rotate(currentAngle);
+            }, 100); 
+
+            ctx.putImageData(newImageData, canvas.width / 2 - width / 2, canvas.height / 2 - height / 2);
+        }
+
 
 	    // Create a new image data object to hold the new image
-            var newImageData = ctx.createImageData(width, height);
+        var newImageData = ctx.createImageData(width, height);
 	    var transMatrix = GetTranslationMatrix(0, height);// Translate image
 	    var scaleMatrix = GetScalingMatrix(1, -1);// Flip image y axis
 	    var matrix = MultiplyMatrixMatrix(transMatrix, scaleMatrix);// Mix the translation and scale matrices
@@ -70,7 +78,66 @@ var upload = function () {
             showMatrix(matrix);
         }
     }
-}
+
+
+    function rotate(angle) {
+        /*
+        * Rotate will rotate the loaded image and also resize it so that the images
+        * corners dont go "out of bounds" of the canvas 
+        * It takes one parameter, which is the current angle that the image is rotated at
+        */
+
+        var r = angle * Math.PI / 180;
+    
+        // here we have to find the new dimensions of our image, then determine the amount
+        // the image may need to be scaled by
+        var newWidth = Math.abs(width * Math.cos(r)) + Math.abs(height * Math.sin(r));
+        var newHeight = Math.abs(width * Math.sin(r)) + Math.abs(height * Math.cos(r));
+        var scaleBy = Math.min(width / newWidth, height / newHeight);
+    
+        // finding the rotation matrix determined by the given angle and the amount the 
+        // image needs to be scaled by
+        var rotationMatrix = [
+            [scaleFactor * Math.cos(r), -scaleBy * Math.sin(r), 0],
+            [scaleFactor * Math.sin(r), scaleBy * Math.cos(r), 0],
+            [0, 0, 1]
+        ];
+    
+        
+        var newImageData = ctx.createImageData(width, height);
+        var centerX = width / 2;
+        var centerY = height / 2;
+    
+        // here we need to use the rotation matrix to determine the new image's 
+        // pixel data (so we go through the rold image and use the transformation
+        // given by rotation matrix)
+        for (var i = 0; i < ppm_img_data.data.length; i += 4) {
+            var x = (i / 4) % width;
+            var y = Math.floor(i / 4 / width);
+
+            var translatedPixel = [x - centerX, y - centerY, 1];
+            var transformedPixel = MultiplyMatrixVector(rotationMatrix, translatedPixel);
+    
+            transformedPixel[0] = Math.floor(transformedPixel[0] + centerX);
+            transformedPixel[1] = Math.floor(transformedPixel[1] + centerY);
+    
+            if (transformedPixel[0] >= 0 && transformedPixel[0] < width &&
+                transformedPixel[1] >= 0 && transformedPixel[1] < height) {
+                
+                var newIndex = (transformedPixel[1] * width + transformedPixel[0]) * 4;
+                
+                // putting new image data 
+                newImageData.data[newIndex] = ppm_img_data.data[i];
+                newImageData.data[newIndex + 1] = ppm_img_data.data[i + 1];
+                newImageData.data[newIndex + 2] = ppm_img_data.data[i + 2];
+                newImageData.data[newIndex + 3] = 255;
+            }
+        }
+    
+        // replace the old image with the newly rotated image
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.putImageData(newImageData, 0, 0);
+    }
 
 // Show transformation matrix on HTML
 function showMatrix(matrix){
